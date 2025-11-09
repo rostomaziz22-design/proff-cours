@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institut Laadjin Miloud - Sidi Bel Abbès</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #9b59b6;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --futuristic: #00ffff;
+            --futuristic-dark: #0088cc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a192f;
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--futuristic);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        nav a:hover {
+            color: var(--futuristic);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--futuristic);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(44, 62, 80, 0.7) 0%, rgba(10, 25, 47, 0.9) 70%);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--futuristic), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.6);
+            }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.5);
+        }
+
+        /* Floating Elements Animation */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Sections */
+        section {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, var(--futuristic), var(--secondary));
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title p {
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.8;
+        }
+
+        /* Features Section */
+        .features {
+            background-color: rgba(10, 25, 47, 0.7);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+            border-color: var(--futuristic);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--futuristic);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: modalAppear 0.5s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--light);
+        }
+
+        .modal h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--futuristic);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--futuristic);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, var(--futuristic), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+        }
+
+        /* Student Groups Section */
+        .groups-section {
+            background-color: rgba(10, 25, 47, 0.9);
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .group-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .group-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--futuristic), var(--secondary));
+        }
+
+        .group-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .group-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--futuristic);
+        }
+
+        .group-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .group-card p {
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        /* Resources Section */
+        .resources-section {
+            display: none;
+            padding: 100px 0;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .resource-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--futuristic);
+        }
+
+        .resource-card h4 {
+            margin-bottom: 10px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background: var(--secondary);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: var(--futuristic);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            background: var(--futuristic);
+            bottom: 0;
+            left: 0;
+        }
+
+        .footer-column p {
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--futuristic);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            nav {
+                display: none;
+                width: 100%;
+                margin-top: 15px;
+            }
+
+            nav.active {
+                display: block;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* Admin Panel Styles */
+        .admin-panel {
+            display: none;
+            padding: 100px 0;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .admin-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .control-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .control-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .control-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--futuristic);
+        }
+
+        .file-list {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Password Management */
+        .password-management {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .password-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .link-management {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .link-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .links-list {
+            margin-top: 20px;
+        }
+
+        .link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .link-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Message styles */
+        .message {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .message.success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .message.error {
+            background-color: var(--danger);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Institut Laadjin Miloud</h1>
+                        <p>Spécialisé en Formation Professionnelle</p>
+                    </div>
+                </div>
+                <div class="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-target="home">Accueil</a></li>
+                        <li><a href="#" class="nav-link" data-target="students">Étudiants</a></li>
+                        <li><a href="#" class="nav-link" data-target="teachers">Maîtres d'Apprentissage</a></li>
+                        <li><a href="#" class="nav-link" data-target="admin-login">Admin</a></li>
+                        <li id="logout-btn" style="display: none;"><a href="#" id="logout-link">Déconnexion</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="floating-elements" id="floatingElements"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>Institut National Spécialisé</h1>
+                <p>Formation Professionnelle "Laadjin Miloud" - Sidi Bel Abbès</p>
+                <p>Section Informatique</p>
+                <a href="#" class="cta-button" data-target="students">Accéder aux Cours</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Nos Services</h2>
+                <p>Découvrez les différentes fonctionnalités de notre plateforme éducative</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3>Cours en Ligne</h3>
+                    <p>Accédez à tous vos cours et supports de formation depuis n'importe où</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Groupes d'Étude</h3>
+                    <p>Organisés par niveau pour un apprentissage adapté à vos besoins</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3>Ressources Enseignants</h3>
+                    <p>Espace dédié aux maîtres d'apprentissage pour partager les programmes</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Students Section -->
+    <section class="groups-section" id="students" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Espace Étudiants</h2>
+                <p>Accédez aux cours et supports de formation de votre groupe</p>
+            </div>
+            <div class="groups-grid">
+                <div class="group-card">
+                    <div class="group-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3>Groupe 1</h3>
+                    <p>Accédez aux cours et ressources spécifiques au Groupe 1</p>
+                    <button class="cta-button group-login" data-group="1">Accéder</button>
+                </div>
+                <div class="group-card">
+                    <div class="group-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3>Groupe 2</h3>
+                    <p>Accédez aux cours et ressources spécifiques au Groupe 2</p>
+                    <button class="cta-button group-login" data-group="2">Accéder</button>
+                </div>
+                <div class="group-card">
+                    <div class="group-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3>Groupe 3</h3>
+                    <p>Accédez aux cours et ressources spécifiques au Groupe 3</p>
+                    <button class="cta-button group-login" data-group="3">Accéder</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teachers Section -->
+    <section id="teachers" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Espace Maîtres d'Apprentissage</h2>
+                <p>Accédez aux programmes d'étude et ressources pédagogiques</p>
+            </div>
+            <div class="feature-card" style="max-width: 500px; margin: 0 auto;">
+                <div class="feature-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3>Programmes d'Étude</h3>
+                <p>Accédez à l'espace réservé aux maîtres d'apprentissage pour télécharger les programmes d'étude</p>
+                <button class="cta-button" id="teacher-login">Accéder</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section (for after login) -->
+    <section class="resources-section" id="resources">
+        <div class="container">
+            <div class="section-title">
+                <h2 id="resources-title">Ressources</h2>
+                <p id="resources-description">Téléchargez vos cours et supports de formation</p>
+            </div>
+            <div class="resources-grid" id="resources-grid">
+                <!-- Resources will be dynamically added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Panel -->
+    <section class="admin-panel" id="admin-panel" style="display: none;">
+        <div class="container">
+            <div class="admin-header">
+                <h2>Panneau d'Administration</h2>
+                <p>Gérez les fichiers, groupes et paramètres du site</p>
+            </div>
+            
+            <div class="admin-controls">
+                <div class="control-card">
+                    <div class="control-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <h3>Gérer les Fichiers</h3>
+                    <p>Ajoutez, modifiez ou supprimez des fichiers de cours</p>
+                    <button class="btn btn-primary" style="margin-top: 15px;" id="manage-files-btn">Ouvrir</button>
+                </div>
+                <div class="control-card">
+                    <div class="control-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <h3>Gérer les Groupes</h3>
+                    <p>Créez et organisez les groupes d'étudiants</p>
+                    <button class="btn btn-primary" style="margin-top: 15px;" id="manage-groups-btn">Ouvrir</button>
+                </div>
+                <div class="control-card">
+                    <div class="control-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h3>Gérer les Accès</h3>
+                    <p>Modifiez les mots de passe et permissions</p>
+                    <button class="btn btn-primary" style="margin-top: 15px;" id="manage-passwords-btn">Ouvrir</button>
+                </div>
+            </div>
+            
+            <!-- File Management Section -->
+            <div class="link-management" id="file-management" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Gestion des Liens Google Drive</h3>
+                <div class="link-form">
+                    <div class="form-group">
+                        <label for="link-title">Titre du fichier</label>
+                        <input type="text" id="link-title" placeholder="Ex: Cours de Programmation">
+                    </div>
+                    <div class="form-group">
+                        <label for="link-url">URL Google Drive</label>
+                        <input type="text" id="link-url" placeholder="https://drive.google.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label for="link-group">Groupe cible</label>
+                        <select id="link-group">
+                            <option value="1">Groupe 1</option>
+                            <option value="2">Groupe 2</option>
+                            <option value="3">Groupe 3</option>
+                            <option value="teachers">Maîtres d'apprentissage</option>
+                            <option value="all">Tous les groupes</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" id="add-link-btn">Ajouter</button>
+                </div>
+                
+                <div class="links-list" id="links-list">
+                    <!-- Links will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Groups Management Section -->
+            <div class="password-management" id="groups-management" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Gestion des Groupes</h3>
+                <div class="password-form">
+                    <div class="form-group">
+                        <label for="group-name">Nom du groupe</label>
+                        <input type="text" id="group-name" placeholder="Nom du groupe">
+                    </div>
+                    <div class="form-group">
+                        <label for="group-password">Mot de passe</label>
+                        <input type="password" id="group-password" placeholder="Mot de passe">
+                    </div>
+                    <button class="btn btn-success" id="add-group-btn">Ajouter</button>
+                </div>
+                
+                <div class="links-list" id="groups-list">
+                    <!-- Groups will be dynamically added here -->
+                </div>
+            </div>
+            
+            <!-- Password Management Section -->
+            <div class="password-management" id="password-management" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Gestion des Mots de Passe</h3>
+                <div class="password-form">
+                    <div class="form-group">
+                        <label for="password-group">Groupe/Utilisateur</label>
+                        <select id="password-group">
+                            <option value="1">Groupe 1</option>
+                            <option value="2">Groupe 2</option>
+                            <option value="3">Groupe 3</option>
+                            <option value="teachers">Maîtres d'apprentissage</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">Nouveau mot de passe</label>
+                        <input type="password" id="new-password" placeholder="Nouveau mot de passe">
+                    </div>
+                    <button class="btn btn-success" id="update-password-btn">Mettre à jour</button>
+                </div>
+                
+                <div class="password-list" id="password-list" style="margin-top: 20px;">
+                    <!-- Password status will be shown here -->
+                </div>
+            </div>
+            
+            <div class="file-list" id="recent-files">
+                <h3 style="margin-bottom: 20px;">Fichiers récemment ajoutés</h3>
+                <!-- Files will be dynamically added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Institut Laadjin Miloud</h3>
+                    <p>Spécialisé dans la formation professionnelle à Sidi Bel Abbès</p>
+                    <p>Section Informatique</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Liens Rapides</h3>
+                    <p><a href="#" class="nav-link" data-target="home" style="color: inherit; text-decoration: none;">Accueil</a></p>
+                    <p><a href="#" class="nav-link" data-target="students" style="color: inherit; text-decoration: none;">Espace Étudiants</a></p>
+                    <p><a href="#" class="nav-link" data-target="teachers" style="color: inherit; text-decoration: none;">Maîtres d'Apprentissage</a></p>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Sidi Bel Abbès, Algérie</p>
+                    <p><i class="fas fa-phone"></i> +213 XX XX XX XX</p>
+                    <p><i class="fas fa-envelope"></i> contact@institut-laadjin.dz</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Site créé par <strong>Ms AZIZ Mohamed Rostom</strong> &copy; 2023 Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modals -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modalTitle">Connexion</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="submit-btn" id="submitLogin">
+                    <span id="login-text">Se connecter</span>
+                    <span id="login-spinner" class="loading" style="display: none;"></span>
+                </button>
+                <div id="loginError" style="color: #e74c3c; margin-top: 15px; display: none;">
+                    Nom d'utilisateur ou mot de passe incorrect!
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // CONFIGURATION SUPABASE - À MODIFIER !
+        // =============================================
+        const SUPABASE_URL = 'https://evkayjaojrvioknihxce.supabase.co'; // ⚠️ REMPLACEZ PAR VOTRE URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2F5amFvanJ2aW9rbmloeGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1MzczNTAsImV4cCI6MjA3ODExMzM1MH0.ugM20uysg6ZSI3tECdsdoPvM-yLGXYVuTvR3uzk2yh0'; // ⚠️ REMPLACEZ PAR VOTRE CLÉ
+        
+        // Initialisation de Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Variables globales
+        let currentUser = null;
+        let currentUserType = null;
+
+        // Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            checkExistingSession();
+            
+            // Floating elements animation
+            createFloatingElements();
+            
+            // Navigation functionality
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const nav = document.querySelector('nav');
+            const logoutBtn = document.getElementById('logout-btn');
+            const logoutLink = document.getElementById('logout-link');
+            
+            // Mobile menu toggle
+            mobileMenu.addEventListener('click', function() {
+                nav.classList.toggle('active');
+            });
+            
+            // Navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('data-target');
+                    
+                    // Handle admin login separately
+                    if (target === 'admin-login') {
+                        showLoginModal('admin');
+                        return;
+                    }
+                    
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    
+                    // Show target section
+                    document.getElementById(target).style.display = 'block';
+                    
+                    // Update active nav link
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close mobile menu if open
+                    nav.classList.remove('active');
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                });
+            });
+            
+            // Logout functionality
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // Group login buttons
+            const groupLoginBtns = document.querySelectorAll('.group-login');
+            groupLoginBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const group = this.getAttribute('data-group');
+                    showLoginModal(`group${group}`);
+                });
+            });
+            
+            // Teacher login button
+            document.getElementById('teacher-login').addEventListener('click', function() {
+                showLoginModal('teachers');
+            });
+            
+            // Login modal functionality
+            const loginModal = document.getElementById('loginModal');
+            const closeModal = document.querySelector('.close-modal');
+            const loginForm = document.getElementById('loginForm');
+            const modalTitle = document.getElementById('modalTitle');
+            const loginError = document.getElementById('loginError');
+            const loginText = document.getElementById('login-text');
+            const loginSpinner = document.getElementById('login-spinner');
+            
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                loginModal.style.display = 'none';
+                loginError.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === loginModal) {
+                    loginModal.style.display = 'none';
+                    loginError.style.display = 'none';
+                }
+            });
+            
+            // Login form submission
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const loginType = document.getElementById('submitLogin').getAttribute('data-type');
+                
+                // Reset error message
+                loginError.style.display = 'none';
+                
+                // Show loading state
+                loginText.style.display = 'none';
+                loginSpinner.style.display = 'inline-block';
+                
+                // Authenticate user
+                const success = await authenticate(loginType, username, password);
+                
+                // Hide loading state
+                loginText.style.display = 'inline-block';
+                loginSpinner.style.display = 'none';
+                
+                if (success) {
+                    loginModal.style.display = 'none';
+                    
+                    if (loginType === 'admin') {
+                        // Show admin panel
+                        sections.forEach(section => {
+                            section.style.display = 'none';
+                        });
+                        document.getElementById('admin-panel').style.display = 'block';
+                        
+                        // Update nav
+                        navLinks.forEach(link => link.classList.remove('active'));
+                        
+                        // Load admin data
+                        loadAdminData();
+                    } else {
+                        // For groups and teachers, show resources section
+                        await showResources(loginType);
+                    }
+                } else {
+                    loginError.style.display = 'block';
+                }
+            });
+            
+            // Admin panel buttons
+            document.getElementById('manage-files-btn').addEventListener('click', function() {
+                document.getElementById('file-management').style.display = 'block';
+                document.getElementById('password-management').style.display = 'none';
+                document.getElementById('groups-management').style.display = 'none';
+                loadLinksList();
+            });
+            
+            document.getElementById('manage-groups-btn').addEventListener('click', function() {
+                document.getElementById('file-management').style.display = 'none';
+                document.getElementById('password-management').style.display = 'none';
+                document.getElementById('groups-management').style.display = 'block';
+                loadGroupsList();
+            });
+            
+            document.getElementById('manage-passwords-btn').addEventListener('click', function() {
+                document.getElementById('file-management').style.display = 'none';
+                document.getElementById('password-management').style.display = 'block';
+                document.getElementById('groups-management').style.display = 'none';
+                loadPasswordStatus();
+            });
+            
+            // Add link button
+            document.getElementById('add-link-btn').addEventListener('click', function() {
+                addNewLink();
+            });
+            
+            // Add group button
+            document.getElementById('add-group-btn').addEventListener('click', function() {
+                addNewGroup();
+            });
+            
+            // Update password button
+            document.getElementById('update-password-btn').addEventListener('click', function() {
+                updatePassword();
+            });
+        });
+        
+        // Check if user has an existing session
+        async function checkExistingSession() {
+            const session = await supabase.auth.getSession();
+            if (session.data.session) {
+                // User is logged in, restore their session
+                const userType = localStorage.getItem('currentUserType');
+                if (userType) {
+                    currentUserType = userType;
+                    showResources(userType);
+                    document.getElementById('logout-btn').style.display = 'block';
+                }
+            }
+        }
+        
+        // Create floating elements for background animation
+        function createFloatingElements() {
+            const container = document.getElementById('floatingElements');
+            const elementsCount = 15;
+            
+            for (let i = 0; i < elementsCount; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                
+                // Random size
+                const size = Math.random() * 60 + 20;
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                
+                // Random position
+                element.style.left = `${Math.random() * 100}%`;
+                element.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation duration
+                const duration = Math.random() * 20 + 10;
+                element.style.animationDuration = `${duration}s`;
+                
+                // Random delay
+                const delay = Math.random() * 5;
+                element.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(element);
+            }
+        }
+        
+        // Show login modal
+        function showLoginModal(type) {
+            const modal = document.getElementById('loginModal');
+            const title = document.getElementById('modalTitle');
+            const submitBtn = document.getElementById('submitLogin');
+            
+            // Set modal title and button data-type based on login type
+            if (type === 'admin') {
+                title.textContent = 'Connexion Administrateur';
+                submitBtn.setAttribute('data-type', 'admin');
+            } else if (type.startsWith('group')) {
+                const groupNum = type.replace('group', '');
+                title.textContent = `Connexion Groupe ${groupNum}`;
+                submitBtn.setAttribute('data-type', type);
+            } else if (type === 'teachers') {
+                title.textContent = 'Connexion Maîtres d\'Apprentissage';
+                submitBtn.setAttribute('data-type', 'teachers');
+            }
+            
+            // Reset form
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            
+            modal.style.display = 'flex';
+        }
+        
+        // Authentication function - SIMPLIFIED FOR NEW DATABASE
+        async function authenticate(type, username, password) {
+            try {
+                console.log('🔐 Authentication attempt:', { type, username });
+                
+                let table, queryField, queryValue;
+                
+                // Determine which table and query to use
+                switch(type) {
+                    case 'admin':
+                        table = 'admins';
+                        queryField = 'username';
+                        queryValue = username;
+                        break;
+                    case 'teachers':
+                        table = 'apprentices';
+                        queryField = 'name';
+                        queryValue = username;
+                        break;
+                    default:
+                        // For groups
+                        const groupId = type.replace('group', '');
+                        return await authenticateGroup(groupId, username, password, type);
+                }
+                
+                // Get user from database
+                const { data, error } = await supabase
+                    .from(table)
+                    .select('*')
+                    .eq(queryField, queryValue)
+                    .single();
+                    
+                console.log('📊 Database response:', { data, error });
+                
+                if (error || !data) {
+                    console.log('❌ User not found or error:', error);
+                    return false;
+                }
+                
+                // Use bcrypt verification via RPC
+                const { data: verifyResult, error: verifyError } = await supabase
+                    .rpc('verify_password', {
+                        plain_password: password,
+                        hashed_password: data.password_hash
+                    });
+                
+                if (verifyError) {
+                    console.error('❌ RPC Error:', verifyError);
+                    // Fallback to simple comparison for testing
+                    if (data.password_hash === password) {
+                        console.log('✅ Authentication successful (fallback)');
+                        currentUser = data;
+                        currentUserType = type;
+                        localStorage.setItem('currentUserType', currentUserType);
+                        document.getElementById('logout-btn').style.display = 'block';
+                        return true;
+                    }
+                    return false;
+                }
+                
+                if (verifyResult) {
+                    console.log('✅ Authentication successful (bcrypt)');
+                    currentUser = data;
+                    currentUserType = type;
+                    localStorage.setItem('currentUserType', currentUserType);
+                    document.getElementById('logout-btn').style.display = 'block';
+                    return true;
+                }
+                
+                console.log('❌ Password incorrect');
+                return false;
+                
+            } catch (error) {
+                console.error('💥 Authentication error:', error);
+                return false;
+            }
+        }
+
+        // Helper function for group authentication - SIMPLIFIED
+        async function authenticateGroup(groupId, username, password, userType) {
+            console.log('👥 Group authentication:', { groupId, username, userType });
+            
+            try {
+                // First try group authentication
+                const { data: groupData, error: groupError } = await supabase
+                    .from('groups')
+                    .select('*')
+                    .eq('id', groupId)
+                    .single();
+                    
+                console.log('📊 Group data:', { groupData, groupError });
+                
+                if (!groupError && groupData) {
+                    const { data: verifyResult, error: verifyError } = await supabase
+                        .rpc('verify_password', {
+                            plain_password: password,
+                            hashed_password: groupData.password_hash
+                        });
+                    
+                    if (!verifyError && verifyResult) {
+                        currentUser = groupData;
+                        currentUserType = userType;
+                        localStorage.setItem('currentUserType', currentUserType);
+                        document.getElementById('logout-btn').style.display = 'block';
+                        console.log('✅ Group authentication successful!');
+                        return true;
+                    }
+                    
+                    // Fallback to simple comparison
+                    if (groupData.password_hash === password) {
+                        currentUser = groupData;
+                        currentUserType = userType;
+                        localStorage.setItem('currentUserType', currentUserType);
+                        document.getElementById('logout-btn').style.display = 'block';
+                        console.log('✅ Group authentication successful (fallback)!');
+                        return true;
+                    }
+                }
+                
+                // Then try student authentication
+                const { data: studentData, error: studentError } = await supabase
+                    .from('students')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('group_id', groupId)
+                    .single();
+                    
+                console.log('📊 Student data:', { studentData, studentError });
+                
+                if (!studentError && studentData) {
+                    const { data: verifyResult, error: verifyError } = await supabase
+                        .rpc('verify_password', {
+                            plain_password: password,
+                            hashed_password: studentData.password_hash
+                        });
+                    
+                    if (!verifyError && verifyResult) {
+                        currentUser = studentData;
+                        currentUserType = userType;
+                        localStorage.setItem('currentUserType', currentUserType);
+                        document.getElementById('logout-btn').style.display = 'block';
+                        console.log('✅ Student authentication successful!');
+                        return true;
+                    }
+                    
+                    // Fallback to simple comparison
+                    if (studentData.password_hash === password) {
+                        currentUser = studentData;
+                        currentUserType = userType;
+                        localStorage.setItem('currentUserType', currentUserType);
+                        document.getElementById('logout-btn').style.display = 'block';
+                        console.log('✅ Student authentication successful (fallback)!');
+                        return true;
+                    }
+                }
+                
+                console.log('❌ All authentication attempts failed');
+                return false;
+                
+            } catch (error) {
+                console.error('💥 Group auth error:', error);
+                return false;
+            }
+        }
+        
+        // Show resources after successful login
+        async function showResources(type) {
+            // Hide all sections
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show resources section
+            const resourcesSection = document.getElementById('resources');
+            resourcesSection.style.display = 'block';
+            
+            // Update title and description based on user type
+            const title = document.getElementById('resources-title');
+            const description = document.getElementById('resources-description');
+            const resourcesGrid = document.getElementById('resources-grid');
+            
+            // Clear previous resources
+            resourcesGrid.innerHTML = '';
+            
+            // Get links from Supabase
+            let linksQuery = supabase.from('links').select('*');
+            
+            // Filter links based on user type
+            if (type.startsWith('group')) {
+                const groupId = type.replace('group', '');
+                linksQuery = linksQuery.or(`group_id.eq.${groupId},group_id.is.null`);
+                title.textContent = `Ressources - Groupe ${groupId}`;
+                description.textContent = 'Téléchargez vos cours et supports de formation';
+            } else if (type === 'teachers') {
+                linksQuery = linksQuery.or('maitre_id.is.not.null,group_id.is.null');
+                title.textContent = 'Programmes d\'Étude';
+                description.textContent = 'Téléchargez les programmes et ressources pédagogiques';
+            } else if (type === 'admin') {
+                linksQuery = linksQuery.select('*');
+                title.textContent = 'Toutes les Ressources';
+                description.textContent = 'Gérez toutes les ressources du site';
+            }
+            
+            const { data: links, error } = await linksQuery;
+            
+            if (error) {
+                console.error('Error fetching links:', error);
+                resourcesGrid.innerHTML = '<p>Erreur lors du chargement des ressources</p>';
+                return;
+            }
+            
+            // Add resources to the grid
+            if (links && links.length > 0) {
+                links.forEach(link => {
+                    const resourceCard = document.createElement('div');
+                    resourceCard.className = 'resource-card';
+                    resourceCard.innerHTML = `
+                        <div class="resource-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h4>${link.title}</h4>
+                        <p>Ajouté le ${new Date(link.created_at).toLocaleDateString()}</p>
+                        <a href="${link.url}" class="download-btn" target="_blank">
+                            <i class="fas fa-download"></i> Télécharger
+                        </a>
+                    `;
+                    resourcesGrid.appendChild(resourceCard);
+                });
+            } else {
+                resourcesGrid.innerHTML = '<p>Aucune ressource disponible pour le moment</p>';
+            }
+            
+            // Update navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        // Load admin data
+        async function loadAdminData() {
+            await loadLinksList();
+            await loadGroupsList();
+            await loadPasswordStatus();
+            await loadRecentFiles();
+        }
+        
+        // Load links list for admin
+        async function loadLinksList() {
+            const linksList = document.getElementById('links-list');
+            
+            // Clear previous list
+            linksList.innerHTML = '';
+            
+            // Get links from Supabase
+            const { data: links, error } = await supabase
+                .from('links')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('Error fetching links:', error);
+                linksList.innerHTML = '<p>Erreur lors du chargement des liens</p>';
+                return;
+            }
+            
+            // Add links to the list
+            if (links && links.length > 0) {
+                links.forEach(link => {
+                    const linkItem = document.createElement('div');
+                    linkItem.className = 'link-item';
+                    linkItem.innerHTML = `
+                        <div>
+                            <h4>${link.title}</h4>
+                            <p>URL: ${link.url} | Groupe: ${link.group_id || 'Tous'} | Date: ${new Date(link.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-danger" onclick="deleteLink(${link.id})">Supprimer</button>
+                        </div>
+                    `;
+                    linksList.appendChild(linkItem);
+                });
+            } else {
+                linksList.innerHTML = '<p>Aucun lien disponible</p>';
+            }
+        }
+        
+        // Load groups list for admin
+        async function loadGroupsList() {
+            const groupsList = document.getElementById('groups-list');
+            
+            // Clear previous list
+            groupsList.innerHTML = '';
+            
+            // Get groups from Supabase
+            const { data: groups, error } = await supabase
+                .from('groups')
+                .select('*')
+                .order('id', { ascending: true });
+            
+            if (error) {
+                console.error('Error fetching groups:', error);
+                groupsList.innerHTML = '<p>Erreur lors du chargement des groupes</p>';
+                return;
+            }
+            
+            // Add groups to the list
+            if (groups && groups.length > 0) {
+                groups.forEach(group => {
+                    const groupItem = document.createElement('div');
+                    groupItem.className = 'link-item';
+                    groupItem.innerHTML = `
+                        <div>
+                            <h4>Groupe ${group.id}</h4>
+                            <p>Nom: ${group.name} | Mot de passe: ********</p>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-danger" onclick="deleteGroup(${group.id})">Supprimer</button>
+                        </div>
+                    `;
+                    groupsList.appendChild(groupItem);
+                });
+            } else {
+                groupsList.innerHTML = '<p>Aucun groupe disponible</p>';
+            }
+        }
+        
+        // Add new link
+        async function addNewLink() {
+            const title = document.getElementById('link-title').value;
+            const url = document.getElementById('link-url').value;
+            const group = document.getElementById('link-group').value;
+            
+            if (!title || !url) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            // Prepare data for insertion
+            const linkData = {
+                title: title,
+                url: url,
+                created_at: new Date().toISOString()
+            };
+            
+            // Set group_id or maitre_id based on selection
+            if (group === 'teachers') {
+                linkData.maitre_id = 1;
+            } else if (group !== 'all') {
+                linkData.group_id = parseInt(group);
+            }
+            
+            // Insert into Supabase
+            const { data, error } = await supabase
+                .from('links')
+                .insert([linkData]);
+            
+            if (error) {
+                console.error('Error adding link:', error);
+                alert('Erreur lors de l\'ajout du lien');
+                return;
+            }
+            
+            // Reload links list
+            loadLinksList();
+            loadRecentFiles();
+            
+            // Reset form
+            document.getElementById('link-title').value = '';
+            document.getElementById('link-url').value = '';
+            
+            alert('Lien ajouté avec succès!');
+        }
+        
+        // Add new group
+        async function addNewGroup() {
+            const name = document.getElementById('group-name').value;
+            const password = document.getElementById('group-password').value;
+            
+            if (!name || !password) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            // For simplicity, store password as plain text initially
+            // You can implement bcrypt later
+            const { data, error } = await supabase
+                .from('groups')
+                .insert([{
+                    name: name,
+                    password_hash: password,
+                    created_at: new Date().toISOString()
+                }]);
+            
+            if (error) {
+                console.error('Error adding group:', error);
+                alert('Erreur lors de l\'ajout du groupe');
+                return;
+            }
+            
+            // Reload groups list
+            loadGroupsList();
+            
+            // Reset form
+            document.getElementById('group-name').value = '';
+            document.getElementById('group-password').value = '';
+            
+            alert('Groupe ajouté avec succès!');
+        }
+        
+        // Delete link
+        async function deleteLink(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce lien?')) {
+                const { error } = await supabase
+                    .from('links')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    console.error('Error deleting link:', error);
+                    alert('Erreur lors de la suppression du lien');
+                    return;
+                }
+                
+                // Reload links list
+                loadLinksList();
+                loadRecentFiles();
+                
+                alert('Lien supprimé avec succès!');
+            }
+        }
+        
+        // Delete group
+        async function deleteGroup(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce groupe? Cette action supprimera également tous les étudiants associés.')) {
+                const { error } = await supabase
+                    .from('groups')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    console.error('Error deleting group:', error);
+                    alert('Erreur lors de la suppression du groupe');
+                    return;
+                }
+                
+                // Reload groups list
+                loadGroupsList();
+                
+                alert('Groupe supprimé avec succès!');
+            }
+        }
+        
+        // Load password status
+        async function loadPasswordStatus() {
+            const passwordList = document.getElementById('password-list');
+            
+            // Clear previous list
+            passwordList.innerHTML = '';
+            
+            // Get all users from different tables
+            const [adminsResult, groupsResult, apprenticesResult] = await Promise.all([
+                supabase.from('admins').select('id, username'),
+                supabase.from('groups').select('id, name'),
+                supabase.from('apprentices').select('id, name')
+            ]);
+            
+            // Add password status
+            if (adminsResult.data && adminsResult.data.length > 0) {
+                adminsResult.data.forEach(admin => {
+                    const statusItem = document.createElement('div');
+                    statusItem.className = 'link-item';
+                    statusItem.innerHTML = `
+                        <div>
+                            <h4>Administrateur</h4>
+                            <p>Nom d'utilisateur: ${admin.username}</p>
+                        </div>
+                    `;
+                    passwordList.appendChild(statusItem);
+                });
+            }
+            
+            if (groupsResult.data && groupsResult.data.length > 0) {
+                groupsResult.data.forEach(group => {
+                    const statusItem = document.createElement('div');
+                    statusItem.className = 'link-item';
+                    statusItem.innerHTML = `
+                        <div>
+                            <h4>Groupe ${group.id}</h4>
+                            <p>Nom: ${group.name}</p>
+                        </div>
+                    `;
+                    passwordList.appendChild(statusItem);
+                });
+            }
+            
+            if (apprenticesResult.data && apprenticesResult.data.length > 0) {
+                apprenticesResult.data.forEach(apprentice => {
+                    const statusItem = document.createElement('div');
+                    statusItem.className = 'link-item';
+                    statusItem.innerHTML = `
+                        <div>
+                            <h4>Maître d'apprentissage</h4>
+                            <p>Nom: ${apprentice.name}</p>
+                        </div>
+                    `;
+                    passwordList.appendChild(statusItem);
+                });
+            }
+            
+            if (passwordList.children.length === 0) {
+                passwordList.innerHTML = '<p>Aucun utilisateur trouvé</p>';
+            }
+        }
+        
+        // Update password
+        async function updatePassword() {
+            const group = document.getElementById('password-group').value;
+            const newPassword = document.getElementById('new-password').value;
+            
+            if (!newPassword) {
+                alert('Veuillez entrer un nouveau mot de passe');
+                return;
+            }
+            
+            let table, id;
+            
+            // Determine which table to update based on selection
+            switch(group) {
+                case 'admin':
+                    table = 'admins';
+                    id = 1;
+                    break;
+                case 'teachers':
+                    table = 'apprentices';
+                    id = 1;
+                    break;
+                default:
+                    table = 'groups';
+                    id = parseInt(group);
+            }
+            
+            // For simplicity, store as plain text initially
+            const { error } = await supabase
+                .from(table)
+                .update({ password_hash: newPassword })
+                .eq('id', id);
+            
+            if (error) {
+                console.error('Error updating password:', error);
+                alert('Erreur lors de la mise à jour du mot de passe');
+                return;
+            }
+            
+            // Reset form
+            document.getElementById('new-password').value = '';
+            
+            // Reload password status
+            loadPasswordStatus();
+            
+            alert('Mot de passe mis à jour avec succès!');
+        }
+        
+        // Load recent files for admin dashboard
+        async function loadRecentFiles() {
+            const recentFiles = document.getElementById('recent-files');
+            
+            // Clear previous content
+            recentFiles.innerHTML = '<h3 style="margin-bottom: 20px;">Fichiers récemment ajoutés</h3>';
+            
+            // Get recent links from Supabase
+            const { data: links, error } = await supabase
+                .from('links')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(5);
+            
+            if (error) {
+                console.error('Error fetching recent files:', error);
+                recentFiles.innerHTML += '<p>Erreur lors du chargement des fichiers récents</p>';
+                return;
+            }
+            
+            // Add files to the list
+            if (links && links.length > 0) {
+                links.forEach(link => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <div>
+                            <h4>${link.title}</h4>
+                            <p>Ajouté le ${new Date(link.created_at).toLocaleDateString()} - ${link.group_id ? `Groupe ${link.group_id}` : (link.maitre_id ? 'Maîtres' : 'Tous les groupes')}</p>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-primary" onclick="editLink(${link.id})">Modifier</button>
+                            <button class="btn btn-danger" onclick="deleteLink(${link.id})">Supprimer</button>
+                        </div>
+                    `;
+                    recentFiles.appendChild(fileItem);
+                });
+            } else {
+                recentFiles.innerHTML += '<p>Aucun fichier récent</p>';
+            }
+        }
+        
+        // Edit link (placeholder function)
+        function editLink(id) {
+            alert('Fonctionnalité de modification à implémenter');
+        }
+        
+        // Logout function
+        function logout() {
+            currentUser = null;
+            currentUserType = null;
+            localStorage.removeItem('currentUserType');
+            document.getElementById('logout-btn').style.display = 'none';
+            
+            // Hide all sections except home
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById('home').style.display = 'block';
+            
+            // Reset navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('active'));
+            document.querySelector('[data-target="home"]').classList.add('active');
+            
+            alert('Déconnexion réussie');
+        }
+    </script>
+</body>
+</html>
