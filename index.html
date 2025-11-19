@@ -1190,9 +1190,7 @@
             });
             
          
-            // ======================================================
-// 🔐 FORMULAIRE DE CONNEXION — SUBMIT
-// ======================================================
+
 loginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -1240,9 +1238,7 @@ loginForm.addEventListener('submit', async function(e) {
 });
 
 
-// ======================================================
-// 🔧 GESTION DES SECTIONS ADMIN
-// ======================================================
+
 document.getElementById('manage-files-btn').addEventListener('click', function() {
     document.getElementById('file-management').style.display = 'block';
     document.getElementById('password-management').style.display = 'none';
@@ -1277,9 +1273,7 @@ document.getElementById('update-password-btn').addEventListener('click', functio
 });
 
 
-// ======================================================
-// 🔎 RESTAURE SESSION EXISTANTE
-// ======================================================
+
 async function checkExistingSession() {
     const session = await supabase.auth.getSession();
 
@@ -1294,9 +1288,7 @@ async function checkExistingSession() {
 }
 
 
-// ======================================================
-// 🎨 ÉLÉMENTS FLOTTANTS (EFFET VISUEL)
-// ======================================================
+
 function createFloatingElements() {
     const container = document.getElementById('floatingElements');
     const elementsCount = 15;
@@ -1323,9 +1315,7 @@ function createFloatingElements() {
 }
 
 
-// ======================================================
-// 🔐 MODAL DE CONNEXION
-// ======================================================
+
 function showLoginModal(type) {
     const modal = document.getElementById('loginModal');
     const title = document.getElementById('modalTitle');
@@ -1351,9 +1341,7 @@ function showLoginModal(type) {
 }
 
 
-// ======================================================
-// 🔒 AUTHENTIFICATION (ADMIN / APPRENTICE) — BCRYPT
-// ======================================================
+
 async function authenticate(type, username, password) {
     try {
         let table, field;
@@ -1404,9 +1392,7 @@ async function authenticate(type, username, password) {
 }
 
 
-// ======================================================
-// 🔒 AUTHENTIFICATION GROUPES + ÉTUDIANTS — BCRYPT
-// ======================================================
+
 async function authenticateGroup(groupId, username, password, userType) {
     try {
         // Vérifier groupe
@@ -1469,9 +1455,7 @@ async function authenticateGroup(groupId, username, password, userType) {
 
 
 
-// ======================================================
-// 🔐 LOAD PASSWORD STATUS — VERSION **CORRIGÉE**
-// ======================================================
+
 async function loadPasswordStatus() {
 
     const passwordList = document.getElementById('password-list');
@@ -1535,9 +1519,7 @@ async function loadPasswordStatus() {
 
 
 
-        // ------------------------------------------------------------
-        // 🔐 UPDATE PASSWORD (HASH SÉCURISÉ)
-        // ------------------------------------------------------------
+     
         async function updatePassword() {
             const group = document.getElementById('password-group').value;
             const newPassword = document.getElementById('new-password').value;
@@ -1563,7 +1545,7 @@ async function loadPasswordStatus() {
                     id = parseInt(group);
             }
 
-            // Hash sécurisé via RPC
+          
             const { data: hashedPassword, error: hashError } = await supabase.rpc(
                 'hash_password',
                 { plain_password: newPassword }
@@ -1593,8 +1575,6 @@ async function loadPasswordStatus() {
         }
 
 
-        <!-- 📁 FICHIERS RÉCENTS -->
-       // 📁 FICHIERS RÉCENTS
 async function loadRecentFiles() {
     const recentFiles = document.getElementById('recent-files');
     recentFiles.innerHTML = '<h3 style="margin-bottom: 20px;">Fichiers récemment ajoutés</h3>';
@@ -1660,6 +1640,7 @@ function logout() {
     </script>
 </body>
 </html>
+
 
 
 
