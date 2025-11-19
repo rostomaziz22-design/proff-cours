@@ -1190,690 +1190,366 @@
             });
             
          
-            loginForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                const loginType = document.getElementById('submitLogin').getAttribute('data-type');
-                
-         
-                loginError.style.display = 'none';
-                
-          
-                loginText.style.display = 'none';
-                loginSpinner.style.display = 'inline-block';
-                
-     
-                const success = await authenticate(loginType, username, password);
-                
-              
-                loginText.style.display = 'inline-block';
-                loginSpinner.style.display = 'none';
-                
-                if (success) {
-                    loginModal.style.display = 'none';
-                    
-                    if (loginType === 'admin') {
-                     
-                        sections.forEach(section => {
-                            section.style.display = 'none';
-                        });
-                        document.getElementById('admin-panel').style.display = 'block';
-                        
-                 
-                        navLinks.forEach(link => link.classList.remove('active'));
-                        
-                
-                        loadAdminData();
-                    } else {
-                      
-                        await showResources(loginType);
-                    }
-                } else {
-                    loginError.style.display = 'block';
-                }
-            });
-            
-          
-            document.getElementById('manage-files-btn').addEventListener('click', function() {
-                document.getElementById('file-management').style.display = 'block';
-                document.getElementById('password-management').style.display = 'none';
-                document.getElementById('groups-management').style.display = 'none';
-                loadLinksList();
-            });
-            
-            document.getElementById('manage-groups-btn').addEventListener('click', function() {
-                document.getElementById('file-management').style.display = 'none';
-                document.getElementById('password-management').style.display = 'none';
-                document.getElementById('groups-management').style.display = 'block';
-                loadGroupsList();
-            });
-            
-            document.getElementById('manage-passwords-btn').addEventListener('click', function() {
-                document.getElementById('file-management').style.display = 'none';
-                document.getElementById('password-management').style.display = 'block';
-                document.getElementById('groups-management').style.display = 'none';
-                loadPasswordStatus();
-            });
-            
- 
-            document.getElementById('add-link-btn').addEventListener('click', function() {
-                addNewLink();
-            });
-            
- 
-            document.getElementById('add-group-btn').addEventListener('click', function() {
-                addNewGroup();
-            });
-            
-  
-            document.getElementById('update-password-btn').addEventListener('click', function() {
-                updatePassword();
-            });
-        });
-        
+            // ======================================================
+// 🔐 FORMULAIRE DE CONNEXION — SUBMIT
+// ======================================================
+loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-        async function checkExistingSession() {
-            const session = await supabase.auth.getSession();
-            if (session.data.session) {
-   
-                const userType = localStorage.getItem('currentUserType');
-                if (userType) {
-                    currentUserType = userType;
-                    showResources(userType);
-                    document.getElementById('logout-btn').style.display = 'block';
-                }
-            }
-        }
-        
-    
-        function createFloatingElements() {
-            const container = document.getElementById('floatingElements');
-            const elementsCount = 15;
-            
-            for (let i = 0; i < elementsCount; i++) {
-                const element = document.createElement('div');
-                element.classList.add('floating-element');
-                
-              
-                const size = Math.random() * 60 + 20;
-                element.style.width = `${size}px`;
-                element.style.height = `${size}px`;
-                
-            
-                element.style.left = `${Math.random() * 100}%`;
-                element.style.top = `${Math.random() * 100}%`;
-                
-           
-                const duration = Math.random() * 20 + 10;
-                element.style.animationDuration = `${duration}s`;
-                
-             
-                const delay = Math.random() * 5;
-                element.style.animationDelay = `${delay}s`;
-                
-                container.appendChild(element);
-            }
-        }
-        
-       
-        function showLoginModal(type) {
-            const modal = document.getElementById('loginModal');
-            const title = document.getElementById('modalTitle');
-            const submitBtn = document.getElementById('submitLogin');
-            
-          
-            if (type === 'admin') {
-                title.textContent = 'Connexion Administrateur';
-                submitBtn.setAttribute('data-type', 'admin');
-            } else if (type.startsWith('group')) {
-                const groupNum = type.replace('group', '');
-                title.textContent = `Connexion Groupe ${groupNum}`;
-                submitBtn.setAttribute('data-type', type);
-            } else if (type === 'teachers') {
-                title.textContent = 'Connexion Maîtres d\'Apprentissage';
-                submitBtn.setAttribute('data-type', 'teachers');
-            }
-            
-          
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('loginError').style.display = 'none';
-            
-            modal.style.display = 'flex';
-        }
-        
-     
-        async function authenticate(type, username, password) {
-            try {
-                console.log('🔐 Authentication attempt:', { type, username });
-                
-                let table, queryField, queryValue;
-                
-      
-                switch(type) {
-                    case 'admin':
-                        table = 'admins';
-                        queryField = 'username';
-                        queryValue = username;
-                        break;
-                    case 'teachers':
-                        table = 'apprentices';
-                        queryField = 'name';
-                        queryValue = username;
-                        break;
-                    default:
-                      
-                        const groupId = type.replace('group', '');
-                        return await authenticateGroup(groupId, username, password, type);
-                }
-                
-     
-                const { data, error } = await supabase
-                    .from(table)
-                    .select('*')
-                    .eq(queryField, queryValue)
-                    .single();
-                    
-                console.log('📊 Database response:', { data, error });
-                
-                if (error || !data) {
-                    console.log('❌ User not found or error:', error);
-                    return false;
-                }
-                
-                // Use bcrypt verification via RPC
-                const { data: verifyResult, error: verifyError } = await supabase
-                    .rpc('verify_password', {
-                        plain_password: password,
-                        hashed_password: data.password_hash
-                    });
-                
-                if (verifyError) {
-                    console.error('❌ RPC Error:', verifyError);
-                    // Fallback to simple comparison for testing
-                    if (data.password_hash === password) {
-                        console.log('✅ Authentication successful (fallback)');
-                        currentUser = data;
-                        currentUserType = type;
-                        localStorage.setItem('currentUserType', currentUserType);
-                        document.getElementById('logout-btn').style.display = 'block';
-                        return true;
-                    }
-                    return false;
-                }
-                
-                if (verifyResult) {
-                    console.log('✅ Authentication successful (bcrypt)');
-                    currentUser = data;
-                    currentUserType = type;
-                    localStorage.setItem('currentUserType', currentUserType);
-                    document.getElementById('logout-btn').style.display = 'block';
-                    return true;
-                }
-                
-                console.log('❌ Password incorrect');
-                return false;
-                
-            } catch (error) {
-                console.error('💥 Authentication error:', error);
-                return false;
-            }
-        }
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const loginType = document.getElementById('submitLogin').getAttribute('data-type');
 
-    
-        async function authenticateGroup(groupId, username, password, userType) {
-            console.log('👥 Group authentication:', { groupId, username, userType });
-            
-            try {
-             
-                const { data: groupData, error: groupError } = await supabase
-                    .from('groups')
-                    .select('*')
-                    .eq('id', groupId)
-                    .single();
-                    
-                console.log('📊 Group data:', { groupData, groupError });
-                
-                if (!groupError && groupData) {
-                    const { data: verifyResult, error: verifyError } = await supabase
-                        .rpc('verify_password', {
-                            plain_password: password,
-                            hashed_password: groupData.password_hash
-                        });
-                    
-                    if (!verifyError && verifyResult) {
-                        currentUser = groupData;
-                        currentUserType = userType;
-                        localStorage.setItem('currentUserType', currentUserType);
-                        document.getElementById('logout-btn').style.display = 'block';
-                        console.log('✅ Group authentication successful!');
-                        return true;
-                    }
-                    
-                
-                    if (groupData.password_hash === password) {
-                        currentUser = groupData;
-                        currentUserType = userType;
-                        localStorage.setItem('currentUserType', currentUserType);
-                        document.getElementById('logout-btn').style.display = 'block';
-                        console.log('✅ Group authentication successful (fallback)!');
-                        return true;
-                    }
-                }
-                
-   
-                const { data: studentData, error: studentError } = await supabase
-                    .from('students')
-                    .select('*')
-                    .eq('username', username)
-                    .eq('group_id', groupId)
-                    .single();
-                    
-                console.log('📊 Student data:', { studentData, studentError });
-                
-                if (!studentError && studentData) {
-                    const { data: verifyResult, error: verifyError } = await supabase
-                        .rpc('verify_password', {
-                            plain_password: password,
-                            hashed_password: studentData.password_hash
-                        });
-                    
-                    if (!verifyError && verifyResult) {
-                        currentUser = studentData;
-                        currentUserType = userType;
-                        localStorage.setItem('currentUserType', currentUserType);
-                        document.getElementById('logout-btn').style.display = 'block';
-                        console.log('✅ Student authentication successful!');
-                        return true;
-                    }
-                    
-             
-                    if (studentData.password_hash === password) {
-                        currentUser = studentData;
-                        currentUserType = userType;
-                        localStorage.setItem('currentUserType', currentUserType);
-                        document.getElementById('logout-btn').style.display = 'block';
-                        console.log('✅ Student authentication successful (fallback)!');
-                        return true;
-                    }
-                }
-                
-                console.log('❌ All authentication attempts failed');
-                return false;
-                
-            } catch (error) {
-                console.error('💥 Group auth error:', error);
-                return false;
-            }
-        }
-        
+    loginError.style.display = 'none';
 
-        async function showResources(type) {
+    // Spinner ON
+    loginText.style.display = 'none';
+    loginSpinner.style.display = 'inline-block';
 
-            const sections = document.querySelectorAll('section');
+    // Tentative authentification
+    const success = await authenticate(loginType, username, password);
+
+    // Spinner OFF
+    loginText.style.display = 'inline-block';
+    loginSpinner.style.display = 'none';
+
+    if (success) {
+        loginModal.style.display = 'none';
+
+        if (loginType === 'admin') {
+            // Masquer toutes les sections
             sections.forEach(section => {
                 section.style.display = 'none';
             });
-            
 
-            const resourcesSection = document.getElementById('resources');
-            resourcesSection.style.display = 'block';
-            
+            // Afficher panneau admin
+            document.getElementById('admin-panel').style.display = 'block';
 
-            const title = document.getElementById('resources-title');
-            const description = document.getElementById('resources-description');
-            const resourcesGrid = document.getElementById('resources-grid');
-            
-   
-            resourcesGrid.innerHTML = '';
-            
-  
-            let linksQuery = supabase.from('links').select('*');
-            
-         
-            if (type.startsWith('group')) {
-                const groupId = type.replace('group', '');
-                linksQuery = linksQuery.or(`group_id.eq.${groupId},group_id.is.null`);
-                title.textContent = `Ressources - Groupe ${groupId}`;
-                description.textContent = 'Téléchargez vos cours et supports de formation';
-            } else if (type === 'teachers') {
-                linksQuery = linksQuery.or('maitre_id.is.not.null,group_id.is.null');
-                title.textContent = 'Programmes d\'Étude';
-                description.textContent = 'Téléchargez les programmes et ressources pédagogiques';
-            } else if (type === 'admin') {
-                linksQuery = linksQuery.select('*');
-                title.textContent = 'Toutes les Ressources';
-                description.textContent = 'Gérez toutes les ressources du site';
-            }
-            
-            const { data: links, error } = await linksQuery;
-            
-            if (error) {
-                console.error('Error fetching links:', error);
-                resourcesGrid.innerHTML = '<p>Erreur lors du chargement des ressources</p>';
-                return;
-            }
-            
-          
-            if (links && links.length > 0) {
-                links.forEach(link => {
-                    const resourceCard = document.createElement('div');
-                    resourceCard.className = 'resource-card';
-                    resourceCard.innerHTML = `
-                        <div class="resource-icon">
-                            <i class="fas fa-file-pdf"></i>
-                        </div>
-                        <h4>${link.title}</h4>
-                        <p>Ajouté le ${new Date(link.created_at).toLocaleDateString()}</p>
-                        <a href="${link.url}" class="download-btn" target="_blank">
-                            <i class="fas fa-download"></i> Télécharger
-                        </a>
-                    `;
-                    resourcesGrid.appendChild(resourceCard);
-                });
-            } else {
-                resourcesGrid.innerHTML = '<p>Aucune ressource disponible pour le moment</p>';
-            }
-            
-      
-            const navLinks = document.querySelectorAll('.nav-link');
+            // Désactiver liens
             navLinks.forEach(link => link.classList.remove('active'));
-            
-   
-            window.scrollTo(0, 0);
-        }
-        
 
-        async function loadAdminData() {
-            await loadLinksList();
-            await loadGroupsList();
-            await loadPasswordStatus();
-            await loadRecentFiles();
-        }
-        
+            // Charger données admin
+            loadAdminData();
 
-        async function loadLinksList() {
-            const linksList = document.getElementById('links-list');
-            
-      
-            linksList.innerHTML = '';
-            
-        
-            const { data: links, error } = await supabase
-                .from('links')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            if (error) {
-                console.error('Error fetching links:', error);
-                linksList.innerHTML = '<p>Erreur lors du chargement des liens</p>';
-                return;
-            }
-            
-          
-            if (links && links.length > 0) {
-                links.forEach(link => {
-                    const linkItem = document.createElement('div');
-                    linkItem.className = 'link-item';
-                    linkItem.innerHTML = `
-                        <div>
-                            <h4>${link.title}</h4>
-                            <p>URL: ${link.url} | Groupe: ${link.group_id || 'Tous'} | Date: ${new Date(link.created_at).toLocaleDateString()}</p>
-                        </div>
-                        <div class="file-actions">
-                            <button class="btn btn-danger" onclick="deleteLink(${link.id})">Supprimer</button>
-                        </div>
-                    `;
-                    linksList.appendChild(linkItem);
-                });
-            } else {
-                linksList.innerHTML = '<p>Aucun lien disponible</p>';
-            }
+        } else {
+            await showResources(loginType);
         }
-        
-      
-        async function loadGroupsList() {
-            const groupsList = document.getElementById('groups-list');
-            
+    } else {
+        loginError.style.display = 'block';
+    }
+});
 
-            groupsList.innerHTML = '';
-            
-    
-            const { data: groups, error } = await supabase
-                .from('groups')
-                .select('*')
-                .order('id', { ascending: true });
-            
-            if (error) {
-                console.error('Error fetching groups:', error);
-                groupsList.innerHTML = '<p>Erreur lors du chargement des groupes</p>';
-                return;
-            }
-            
-      
-            if (groups && groups.length > 0) {
-                groups.forEach(group => {
-                    const groupItem = document.createElement('div');
-                    groupItem.className = 'link-item';
-                    groupItem.innerHTML = `
-                        <div>
-                            <h4>Groupe ${group.id}</h4>
-                            <p>Nom: ${group.name} | Mot de passe: ********</p>
-                        </div>
-                        <div class="file-actions">
-                            <button class="btn btn-danger" onclick="deleteGroup(${group.id})">Supprimer</button>
-                        </div>
-                    `;
-                    groupsList.appendChild(groupItem);
-                });
-            } else {
-                groupsList.innerHTML = '<p>Aucun groupe disponible</p>';
-            }
+
+// ======================================================
+// 🔧 GESTION DES SECTIONS ADMIN
+// ======================================================
+document.getElementById('manage-files-btn').addEventListener('click', function() {
+    document.getElementById('file-management').style.display = 'block';
+    document.getElementById('password-management').style.display = 'none';
+    document.getElementById('groups-management').style.display = 'none';
+    loadLinksList();
+});
+
+document.getElementById('manage-groups-btn').addEventListener('click', function () {
+    document.getElementById('file-management').style.display = 'none';
+    document.getElementById('password-management').style.display = 'none';
+    document.getElementById('groups-management').style.display = 'block';
+    loadGroupsList();
+});
+
+document.getElementById('manage-passwords-btn').addEventListener('click', function () {
+    document.getElementById('file-management').style.display = 'none';
+    document.getElementById('password-management').style.display = 'block';
+    document.getElementById('groups-management').style.display = 'none';
+    loadPasswordStatus();
+});
+
+document.getElementById('add-link-btn').addEventListener('click', function () {
+    addNewLink();
+});
+
+document.getElementById('add-group-btn').addEventListener('click', function () {
+    addNewGroup();
+});
+
+document.getElementById('update-password-btn').addEventListener('click', function () {
+    updatePassword();
+});
+
+
+// ======================================================
+// 🔎 RESTAURE SESSION EXISTANTE
+// ======================================================
+async function checkExistingSession() {
+    const session = await supabase.auth.getSession();
+
+    if (session.data.session) {
+        const userType = localStorage.getItem('currentUserType');
+        if (userType) {
+            currentUserType = userType;
+            showResources(userType);
+            document.getElementById('logout-btn').style.display = 'block';
         }
-        
-  
-        async function addNewLink() {
-            const title = document.getElementById('link-title').value;
-            const url = document.getElementById('link-url').value;
-            const group = document.getElementById('link-group').value;
-            
-            if (!title || !url) {
-                alert('Veuillez remplir tous les champs');
-                return;
-            }
-            
-         
-            const linkData = {
-                title: title,
-                url: url,
-                created_at: new Date().toISOString()
-            };
-            
-  
-            if (group === 'teachers') {
-                linkData.maitre_id = 1;
-            } else if (group !== 'all') {
-                linkData.group_id = parseInt(group);
-            }
-            
- 
-            const { data, error } = await supabase
-                .from('links')
-                .insert([linkData]);
-            
-            if (error) {
-                console.error('Error adding link:', error);
-                alert('Erreur lors de l\'ajout du lien');
-                return;
-            }
-            
-     
-            loadLinksList();
-            loadRecentFiles();
-            
-         
-            document.getElementById('link-title').value = '';
-            document.getElementById('link-url').value = '';
-            
-            alert('Lien ajouté avec succès!');
+    }
+}
+
+
+// ======================================================
+// 🎨 ÉLÉMENTS FLOTTANTS (EFFET VISUEL)
+// ======================================================
+function createFloatingElements() {
+    const container = document.getElementById('floatingElements');
+    const elementsCount = 15;
+
+    for (let i = 0; i < elementsCount; i++) {
+        const el = document.createElement('div');
+        el.classList.add('floating-element');
+
+        const size = Math.random() * 60 + 20;
+        el.style.width = `${size}px`;
+        el.style.height = `${size}px`;
+
+        el.style.left = `${Math.random() * 100}%`;
+        el.style.top = `${Math.random() * 100}%`;
+
+        const duration = Math.random() * 20 + 10;
+        el.style.animationDuration = `${duration}s`;
+
+        const delay = Math.random() * 5;
+        el.style.animationDelay = `${delay}s`;
+
+        container.appendChild(el);
+    }
+}
+
+
+// ======================================================
+// 🔐 MODAL DE CONNEXION
+// ======================================================
+function showLoginModal(type) {
+    const modal = document.getElementById('loginModal');
+    const title = document.getElementById('modalTitle');
+    const btn = document.getElementById('submitLogin');
+
+    if (type === 'admin') {
+        title.textContent = 'Connexion Administrateur';
+        btn.setAttribute('data-type', 'admin');
+    } else if (type.startsWith('group')) {
+        const groupNum = type.replace('group', '');
+        title.textContent = `Connexion Groupe ${groupNum}`;
+        btn.setAttribute('data-type', type);
+    } else if (type === 'teachers') {
+        title.textContent = 'Connexion Maîtres d\'Apprentissage';
+        btn.setAttribute('data-type', 'teachers');
+    }
+
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('loginError').style.display = 'none';
+
+    modal.style.display = 'flex';
+}
+
+
+// ======================================================
+// 🔒 AUTHENTIFICATION (ADMIN / APPRENTICE) — BCRYPT
+// ======================================================
+async function authenticate(type, username, password) {
+    try {
+        let table, field;
+
+        switch(type) {
+            case 'admin':
+                table = 'admins';
+                field = 'username';
+                break;
+
+            case 'teachers':
+                table = 'apprentices';
+                field = 'name';
+                break;
+
+            default:
+                const groupId = type.replace('group', '');
+                return await authenticateGroup(groupId, username, password, type);
         }
-        
- 
-        async function addNewGroup() {
-            const name = document.getElementById('group-name').value;
-            const password = document.getElementById('group-password').value;
-            
-            if (!name || !password) {
-                alert('Veuillez remplir tous les champs');
-                return;
+
+        const { data, error } = await supabase
+            .from(table)
+            .select('*')
+            .eq(field, username)
+            .single();
+
+        if (error || !data) return false;
+
+        const { data: ok, error: verifyErr } = await supabase.rpc(
+            'verify_password',
+            {
+                plain_password: password,
+                hashed_password: data.password_hash
             }
-            
-          
-           
-            const { data, error } = await supabase
-                .from('groups')
-                .insert([{
-                    name: name,
-                    password_hash: password,
-                    created_at: new Date().toISOString()
-                }]);
-            
-            if (error) {
-                console.error('Error adding group:', error);
-                alert('Erreur lors de l\'ajout du groupe');
-                return;
-            }
-            
-      
-            loadGroupsList();
-            
-        
-            document.getElementById('group-name').value = '';
-            document.getElementById('group-password').value = '';
-            
-            alert('Groupe ajouté avec succès!');
-        }
-        
-     
-        async function deleteLink(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce lien?')) {
-                const { error } = await supabase
-                    .from('links')
-                    .delete()
-                    .eq('id', id);
-                
-                if (error) {
-                    console.error('Error deleting link:', error);
-                    alert('Erreur lors de la suppression du lien');
-                    return;
+        );
+
+        if (verifyErr || ok !== true) return false;
+
+        currentUser = data;
+        currentUserType = type;
+        localStorage.setItem('currentUserType', type);
+        document.getElementById('logout-btn').style.display = 'block';
+        return true;
+
+    } catch {
+        return false;
+    }
+}
+
+
+// ======================================================
+// 🔒 AUTHENTIFICATION GROUPES + ÉTUDIANTS — BCRYPT
+// ======================================================
+async function authenticateGroup(groupId, username, password, userType) {
+    try {
+        // Vérifier groupe
+        const { data: groupData } = await supabase
+            .from('groups')
+            .select('*')
+            .eq('id', groupId)
+            .single();
+
+        if (groupData) {
+            const { data: okGroup } = await supabase.rpc(
+                'verify_password',
+                {
+                    plain_password: password,
+                    hashed_password: groupData.password_hash
                 }
-                
-     
-                loadLinksList();
-                loadRecentFiles();
-                
-                alert('Lien supprimé avec succès!');
+            );
+
+            if (okGroup === true) {
+                currentUser = groupData;
+                currentUserType = userType;
+                localStorage.setItem('currentUserType', userType);
+                document.getElementById('logout-btn').style.display = 'block';
+                return true;
             }
         }
-        
-    
-        async function deleteGroup(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce groupe? Cette action supprimera également tous les étudiants associés.')) {
-                const { error } = await supabase
-                    .from('groups')
-                    .delete()
-                    .eq('id', id);
-                
-                if (error) {
-                    console.error('Error deleting group:', error);
-                    alert('Erreur lors de la suppression du groupe');
-                    return;
+
+        // Vérifier étudiant
+        const { data: studentData } = await supabase
+            .from('students')
+            .select('*')
+            .eq('username', username)
+            .eq('group_id', groupId)
+            .single();
+
+        if (studentData) {
+            const { data: okStudent } = await supabase.rpc(
+                'verify_password',
+                {
+                    plain_password: password,
+                    hashed_password: studentData.password_hash
                 }
-                
-           
-                loadGroupsList();
-                
-                alert('Groupe supprimé avec succès!');
+            );
+
+            if (okStudent === true) {
+                currentUser = studentData;
+                currentUserType = userType;
+                localStorage.setItem('currentUserType', userType);
+                document.getElementById('logout-btn').style.display = 'block';
+                return true;
             }
         }
-        
-     
-        async function loadPasswordStatus() {
-            const passwordList = document.getElementById('password-list');
-            
-        
-            passwordList.innerHTML = '';
-            
-           
-            const [adminsResult, groupsResult, apprenticesResult] = await Promise.all([
-                supabase.from('admins').select('id, username'),
-                supabase.from('groups').select('id, name'),
-                supabase.from('apprentices').select('id, name')
-            ]);
-            
-   
-            if (adminsResult.data && adminsResult.data.length > 0) {
-                adminsResult.data.forEach(admin => {
-                    const statusItem = document.createElement('div');
-                    statusItem.className = 'link-item';
-                    statusItem.innerHTML = `
-                        <div>
-                            <h4>Administrateur</h4>
-                            <p>Nom d'utilisateur: ${admin.username}</p>
-                        </div>
-                    `;
-                    passwordList.appendChild(statusItem);
-                });
-            }
-            
-            if (groupsResult.data && groupsResult.data.length > 0) {
-                groupsResult.data.forEach(group => {
-                    const statusItem = document.createElement('div');
-                    statusItem.className = 'link-item';
-                    statusItem.innerHTML = `
-                        <div>
-                            <h4>Groupe ${group.id}</h4>
-                            <p>Nom: ${group.name}</p>
-                        </div>
-                    `;
-                    passwordList.appendChild(statusItem);
-                });
-            }
-            
-            if (apprenticesResult.data && apprenticesResult.data.length > 0) {
-                apprenticesResult.data.forEach(apprentice => {
-                    const statusItem = document.createElement('div');
-                    statusItem.className = 'link-item';
-                    statusItem.innerHTML = `
-                        <div>
-                            <h4>Maître d'apprentissage</h4>
-                            <p>Nom: ${apprentice.name}</p>
-                        </div>
-                    `;
-                    passwordList.appendChild(statusItem);
-                });
-            }
-            
-            if (passwordList.children.length === 0) {
-                passwordList.innerHTML = '<p>Aucun utilisateur trouvé</p>';
-            }
-        }
-        
-      
+
+        return false;
+
+    } catch {
+        return false;
+    }
+}
+
+
+
+// ======================================================
+// 🔐 LOAD PASSWORD STATUS — VERSION **CORRIGÉE**
+// ======================================================
+async function loadPasswordStatus() {
+
+    const passwordList = document.getElementById('password-list');
+    passwordList.innerHTML = '';
+
+    const [adminsResult, groupsResult, apprenticesResult] = await Promise.all([
+        supabase.from('admins').select('id, username'),
+        supabase.from('groups').select('id, name'),
+        supabase.from('apprentices').select('id, name')
+    ]);
+
+    // ADMINS
+    if (adminsResult.data && adminsResult.data.length > 0) {
+        adminsResult.data.forEach(admin => {
+            const item = document.createElement('div');
+            item.className = 'link-item';
+            item.innerHTML = `
+                <div>
+                    <h4>Administrateur</h4>
+                    <p>Nom d'utilisateur : ${admin.username}</p>
+                </div>
+            `;
+            passwordList.appendChild(item);
+        });
+    }
+
+    // GROUPES
+    if (groupsResult.data && groupsResult.data.length > 0) {
+        groupsResult.data.forEach(group => {
+            const item = document.createElement('div');
+            item.className = 'link-item';
+            item.innerHTML = `
+                <div>
+                    <h4>Groupe ${group.id}</h4>
+                    <p>Nom : ${group.name}</p>
+                </div>
+            `;
+            passwordList.appendChild(item);
+        });
+    }
+
+    // MAÎTRES
+    if (apprenticesResult.data && apprenticesResult.data.length > 0) {
+        apprenticesResult.data.forEach(apprentice => {
+            const item = document.createElement('div');
+            item.className = 'link-item';
+            item.innerHTML = `
+                <div>
+                    <h4>Maître d'apprentissage</h4>
+                    <p>Nom : ${apprentice.name}</p>
+                </div>
+            `;
+            passwordList.appendChild(item);
+        });
+    }
+
+    if (passwordList.children.length === 0) {
+        passwordList.innerHTML = '<p>Aucun utilisateur trouvé</p>';
+    }
+}
+
+
+
+        // ------------------------------------------------------------
+        // 🔐 UPDATE PASSWORD (HASH SÉCURISÉ)
+        // ------------------------------------------------------------
         async function updatePassword() {
             const group = document.getElementById('password-group').value;
             const newPassword = document.getElementById('new-password').value;
-            
+
             if (!newPassword) {
                 alert('Veuillez entrer un nouveau mot de passe');
                 return;
             }
-            
+
             let table, id;
-            
-    
-            switch(group) {
+
+            switch (group) {
                 case 'admin':
                     table = 'admins';
                     id = 1;
@@ -1886,49 +1562,54 @@
                     table = 'groups';
                     id = parseInt(group);
             }
-            
-        
+
+            // Hash sécurisé via RPC
+            const { data: hashedPassword, error: hashError } = await supabase.rpc(
+                'hash_password',
+                { plain_password: newPassword }
+            );
+
+            if (hashError) {
+                console.error('Error hashing password:', hashError);
+                alert('Erreur lors du hashage du mot de passe');
+                return;
+            }
+
+            // Mise à jour du hash
             const { error } = await supabase
                 .from(table)
-                .update({ password_hash: newPassword })
+                .update({ password_hash: hashedPassword })
                 .eq('id', id);
-            
+
             if (error) {
                 console.error('Error updating password:', error);
                 alert('Erreur lors de la mise à jour du mot de passe');
                 return;
             }
-            
-       
-            document.getElementById('new-password').value = '';
-            
-    
-            loadPasswordStatus();
-            
-            alert('Mot de passe mis à jour avec succès!');
-        }
-        
 
+            document.getElementById('new-password').value = '';
+            loadPasswordStatus();
+            alert('Mot de passe mis à jour avec succès !');
+        }
+
+
+        <!-- 📁 FICHIERS RÉCENTS -->
         async function loadRecentFiles() {
             const recentFiles = document.getElementById('recent-files');
-            
-         
             recentFiles.innerHTML = '<h3 style="margin-bottom: 20px;">Fichiers récemment ajoutés</h3>';
-            
-  
+
             const { data: links, error } = await supabase
                 .from('links')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(5);
-            
+
             if (error) {
                 console.error('Error fetching recent files:', error);
                 recentFiles.innerHTML += '<p>Erreur lors du chargement des fichiers récents</p>';
                 return;
             }
-            
-        
+
             if (links && links.length > 0) {
                 links.forEach(link => {
                     const fileItem = document.createElement('div');
@@ -1936,7 +1617,8 @@
                     fileItem.innerHTML = `
                         <div>
                             <h4>${link.title}</h4>
-                            <p>Ajouté le ${new Date(link.created_at).toLocaleDateString()} - ${link.group_id ? `Groupe ${link.group_id}` : (link.maitre_id ? 'Maîtres' : 'Tous les groupes')}</p>
+                            <p>Ajouté le ${new Date(link.created_at).toLocaleDateString()} - 
+                            ${link.group_id ? `Groupe ${link.group_id}` : (link.maitre_id ? 'Maîtres' : 'Tous les groupes')}</p>
                         </div>
                         <div class="file-actions">
                             <button class="btn btn-primary" onclick="editLink(${link.id})">Modifier</button>
@@ -1949,35 +1631,35 @@
                 recentFiles.innerHTML += '<p>Aucun fichier récent</p>';
             }
         }
-        
+
 
         function editLink(id) {
             alert('Fonctionnalité de modification à implémenter');
         }
-        
 
+
+        <!-- 🚪 LOGOUT -->
         function logout() {
             currentUser = null;
             currentUserType = null;
             localStorage.removeItem('currentUserType');
             document.getElementById('logout-btn').style.display = 'none';
-            
-        
+
             const sections = document.querySelectorAll('section');
             sections.forEach(section => {
                 section.style.display = 'none';
             });
             document.getElementById('home').style.display = 'block';
-            
-   
+
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => link.classList.remove('active'));
             document.querySelector('[data-target="home"]').classList.add('active');
-            
+
             alert('Déconnexion réussie');
         }
     </script>
 </body>
-
 </html>
+
+
 
