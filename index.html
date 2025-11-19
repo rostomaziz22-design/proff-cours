@@ -1594,69 +1594,69 @@ async function loadPasswordStatus() {
 
 
         <!-- 📁 FICHIERS RÉCENTS -->
-        async function loadRecentFiles() {
-            const recentFiles = document.getElementById('recent-files');
-            recentFiles.innerHTML = '<h3 style="margin-bottom: 20px;">Fichiers récemment ajoutés</h3>';
+       // 📁 FICHIERS RÉCENTS
+async function loadRecentFiles() {
+    const recentFiles = document.getElementById('recent-files');
+    recentFiles.innerHTML = '<h3 style="margin-bottom: 20px;">Fichiers récemment ajoutés</h3>';
 
-            const { data: links, error } = await supabase
-                .from('links')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(5);
+    const { data: links, error } = await supabase
+        .from('links')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
 
-            if (error) {
-                console.error('Error fetching recent files:', error);
-                recentFiles.innerHTML += '<p>Erreur lors du chargement des fichiers récents</p>';
-                return;
-            }
+    if (error) {
+        console.error('Error fetching recent files:', error);
+        recentFiles.innerHTML += '<p>Erreur lors du chargement des fichiers récents</p>';
+        return;
+    }
 
-            if (links && links.length > 0) {
-                links.forEach(link => {
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    fileItem.innerHTML = `
-                        <div>
-                            <h4>${link.title}</h4>
-                            <p>Ajouté le ${new Date(link.created_at).toLocaleDateString()} - 
-                            ${link.group_id ? `Groupe ${link.group_id}` : (link.maitre_id ? 'Maîtres' : 'Tous les groupes')}</p>
-                        </div>
-                        <div class="file-actions">
-                            <button class="btn btn-primary" onclick="editLink(${link.id})">Modifier</button>
-                            <button class="btn btn-danger" onclick="deleteLink(${link.id})">Supprimer</button>
-                        </div>
-                    `;
-                    recentFiles.appendChild(fileItem);
-                });
-            } else {
-                recentFiles.innerHTML += '<p>Aucun fichier récent</p>';
-            }
-        }
+    if (links && links.length > 0) {
+        links.forEach(link => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div>
+                    <h4>${link.title}</h4>
+                    <p>Ajouté le ${new Date(link.created_at).toLocaleDateString()} -
+                    ${link.group_id ? `Groupe ${link.group_id}` : (link.maitre_id ? 'Maîtres' : 'Tous les groupes')}</p>
+                </div>
+                <div class="file-actions">
+                    <button class="btn btn-primary" onclick="editLink(${link.id})">Modifier</button>
+                    <button class="btn btn-danger" onclick="deleteLink(${link.id})">Supprimer</button>
+                </div>
+            `;
+            recentFiles.appendChild(fileItem);
+        });
+    } else {
+        recentFiles.innerHTML += '<p>Aucun fichier récent</p>';
+    }
+}
 
+function editLink(id) {
+    alert('Fonctionnalité de modification à implémenter');
+}
 
-        function editLink(id) {
-            alert('Fonctionnalité de modification à implémenter');
-        }
+// 🚪 LOGOUT
+function logout() {
+    currentUser = null;
+    currentUserType = null;
+    localStorage.removeItem('currentUserType');
+    document.getElementById('logout-btn').style.display = 'none';
 
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        section.style.display = 'none';
+    });
+    document.getElementById('home').style.display = 'block';
 
-        <!-- 🚪 LOGOUT -->
-        function logout() {
-            currentUser = null;
-            currentUserType = null;
-            localStorage.removeItem('currentUserType');
-            document.getElementById('logout-btn').style.display = 'none';
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    document.querySelector('[data-target="home"]').classList.add('active');
 
-            const sections = document.querySelectorAll('section');
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById('home').style.display = 'block';
+    alert('Déconnexion réussie');
+}
 
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => link.classList.remove('active'));
-            document.querySelector('[data-target="home"]').classList.add('active');
-
-            alert('Déconnexion réussie');
-        }
     </script>
 </body>
 </html>
